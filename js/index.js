@@ -3,15 +3,21 @@ var allPersonList = ["龚幸伟", "黄一鸣", "尤翔远", "郭浩", "张晓", 
 
 var allPerson = allPersonList.join(";");
 //领导人员名单
-// var leaderArr = ["方林", "宋浩", "叶辰", "田力玮", "樊清华", "张勇", "蒋明", "官鑫", "李国庆", "赖礼通", "石浩", "杨广霞"];
 var leaderArr = []
-//未中奖人员名单
-var remainPerson = allPerson.toString().split(";");
 //中奖人员名单
 var luckyMan = [];
+try {
+    luckyMan = localStorage.getItem('luckyMan').split(','); // 中奖名单存本地
+} catch (err) {
+}
+//未中奖人员名单
+// var remainPerson = allPerson.toString().split(";");
+var remainPerson = allPersonList.filter(it => luckyMan.indexOf(it) === -1);
+
 var timer;//定时器
 var times = 1;//抽奖次数,如果不是第一次，不加粗显示领导姓名
 $(function () {
+    $("#txtNum").attr("placeholder", "输入中奖人数(" + remainPerson.length + ")");
     iconAnimation();
     //开始抽奖
     $("#btnStart").on("click", function () {
@@ -56,8 +62,11 @@ $(function () {
         showConfirm("确认重置吗？所有已中奖的人会重新回到抽奖池！", function () {
             //熏置未中奖人员名单
             remainPerson = allPerson.toString().split(";");
+            localStorage.removeItem('luckyMan')
+            luckyMan = []
             //中奖人数框置空
-            $("#txtNum").val("").attr("placeholder", "请输入中奖人数");
+            $("#txtNum").attr("placeholder", "输入中奖人数(" + remainPerson.length + ")");
+            // $("#txtNum").val("").attr("placeholder", "请输入中奖人数");
             $("#showName").val("");
             //隐藏中奖名单,然后显示抽奖框
             $("#result").fadeOut();//.prev().fadeIn()
@@ -93,6 +102,7 @@ function startLuckDraw() {
     remainPerson = remainPerson.delete(randomPerson);
     //中奖人员
     luckyMan = luckyMan.concat(randomPerson);
+    localStorage.setItem('luckyMan', luckyMan.join(','))
     //设置抽奖人数框数字为空
     $("#txtNum").val("");
 }
